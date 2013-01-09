@@ -10,11 +10,12 @@ public:
 	bool Init();
 	void EnableRGB(std::string pMode);
 	void EnableDepth();
-	//void EnableGesture();
+	void EnableGesture();
 
 	bool Update();
-	ofTexture& GetRGB();
-	ofTexture& GetDepth();
+	ofTexture& GetRGBMap();
+	ofTexture& GetDepthMap();
+	ofTexture& GetLabelMap();
 	
 private:
 	PXCUPipeline_Session mSession;
@@ -22,15 +23,16 @@ private:
 
 	bool mHasRGB;
 	bool mHasDepth;
-
+	bool mHasLabels;
 
 	short* mDepth;
 	unsigned char* mDepthMap;
-	unsigned char* mRGB;
-	
+	unsigned char* mRGBMap;
+	unsigned char* mLabelMap;
 
 	ofTexture mRGBTex;
 	ofTexture mDepthTex;
-
+	ofTexture mLabelTex;
+	
 	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture& dst);
 };
