@@ -1,4 +1,7 @@
+#include <string>
+#include <vector>
 #include "ofMain.h"
+#include "ofTexture.h"
 #include "pxcupipeline.h"
 
 class ofxPXCU
@@ -6,9 +9,9 @@ class ofxPXCU
 public:
 	ofxPXCU();
 	~ofxPXCU();
-	bool Init();
 
-	void EnableRGB();
+	bool Init();
+	void EnableRGB(std::string pMode);
 	void EnableDepth();
 	//void EnableGesture();
 
@@ -23,11 +26,16 @@ private:
 	bool mHasRGB;
 	bool mHasDepth;
 
-	unsigned char* mRGB;
-	unsigned char* mDepth;
+
+	short *mDepth;
+	unsigned char *mDepthMap;
+	unsigned char *mRGB;
+	
 
 	ofTexture mRGBTex;
 	ofTexture mDepthTex;
+
+	void toTexture(unsigned short* src, ofTexture* dst);
 };
 
 /*
