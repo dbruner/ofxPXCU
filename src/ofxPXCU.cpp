@@ -1,5 +1,4 @@
 #include "ofxPXCU.h"
-#include "ofTexture.h"
 
 ofxPXCU::ofxPXCU()
 {
@@ -37,6 +36,7 @@ bool ofxPXCU::Init()
 		mDepthTex = ofTexture();
 		PXCUPipeline_QueryDepthMapSize(mSession, &w, &h);
 		mDepth = new short[w*h];
+		mDepthMap = new unsigned char[w*h];
 		mDepthTex.allocate(w,h,GL_LUMINANCE);
 	}
 	return true;
