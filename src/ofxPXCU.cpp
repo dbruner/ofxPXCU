@@ -11,7 +11,7 @@ ofxPXCU::~ofxPXCU()
 		PXCUPipeline_Close(mSession);
 }
 
-bool ofxPXCU::Init()
+bool ofxPXCU::Start()
 {
 	int w,h;
 	if(mMode==-1)
