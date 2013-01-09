@@ -8,7 +8,7 @@ public:
 	~ofxPXCU();
 
 	bool Start();
-	void EnableRGB(std::string pMode);
+	void EnableRGB(int pRes);
 	void EnableDepth();
 	void EnableGesture();
 
