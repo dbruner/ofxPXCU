@@ -12,7 +12,7 @@ public:
 	void EnableDepth();
 	//void EnableGesture();
 
-	bool Update(bool pWait);
+	bool Update();
 	ofTexture& GetRGB();
 	ofTexture& GetDepth();
 	
@@ -24,9 +24,9 @@ private:
 	bool mHasDepth;
 
 
-	short *mDepth;
-	unsigned char *mDepthMap;
-	unsigned char *mRGB;
+	short* mDepth;
+	unsigned char* mDepthMap;
+	unsigned char* mRGB;
 	
 
 	ofTexture mRGBTex;
@@ -34,13 +34,3 @@ private:
 
 	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture& dst);
 };
-
-/*
-class ofxGeoNode
-{
-public:
-	ofxGeoNode();
-	ofxGeoNode(PXCGesture::GeoNode pNode);
-
-	
-};*/
