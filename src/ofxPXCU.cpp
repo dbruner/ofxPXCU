@@ -39,51 +39,78 @@ bool ofxPXCU::Start()
 		mDepthMap = new unsigned char[w*h];
 		mDepthTex.allocate(w,h,GL_LUMINANCE);
 	}
+    if(mHasGesture)
+	{
+		mLabelTex = ofTexture();
+		PXCUPipeline_QueryLabelMapSize(mSession, &w, &h);
+		mLabelMap = new unsigned char[w*h];
+		mLabelTex.allocate(w,h,GL_LUMINANCE);
+	}    
 	return true;
 }
 
-void ofxPXCU::EnableRGB(std::string pMode)
+// call with pRes=0 for VGA, pRes=1 for WXGA
+void ofxPXCU::EnableRGB(int pRes)
 {
 	PXCUPipeline rgbMode;
-	switch(pMode)
+	switch(pRes)
 	{
-	case "VGA":
+	case 0:
 		{
 			rgbMode = (PXCUPipeline)PXCU_PIPELINE_COLOR_VGA;
 			break;
 		}
-	case "WXGA":
+	case 1:
 		{
 			rgbMode = (PXCUPipeline)PXCU_PIPELINE_COLOR_WXGA;
 			break;
 		}
 	}
-
-	if(mMode<0)
+	
+	if(!mHasRgb)
 	{
-		mMode = rgbMode;
+    	if(mMode<0)
+    	{
+    		mMode = rgbMode;
+    	}
+    	else
+    	{
+    		mMode = (PXCUPipeline)(mMode|rgbMode);
+    	}
+    	mHasRgb = true;
 	}
-	else
-	{
-		mMode = (PXCUPipeline)(mMode|rgbMode);
-	}
-	mHasRgb = true;
 }
 
 void ofxPXCU::EnableDepth()
 {
-	if(mMode<0)
-	{
-		mMode = (PXCUPipeline)PXCU_PIPELINE_DEPTH_QVGA;
-	}
-	else
-	{
-		mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_DEPTH_QVGA);
-	}
-	mHasDepth = true;
+    if(!mHasDepth)
+    {
+    	if(mMode<0)
+    	{
+    		mMode = (PXCUPipeline)PXCU_PIPELINE_DEPTH_QVGA;
+    	}
+    	else
+    	{
+    		mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_DEPTH_QVGA);
+    	}
+    	mHasDepth = true;
+    }
 }
 
-//void ofxPXCU::EnableGesture();
+void ofxPXCU::EnableGesture()
+{
+    if(!mHasGesture)
+    {
+        if(mMode<0)
+        {
+            mMode = (PXCUPipeline)PXCU_PIPELINE_GESTURE;
+        }
+        else
+        {
+            mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_GESTURE);
+        }
+    }
+}
 
 bool ofxPXCU::Update()
 {
@@ -106,14 +133,19 @@ bool ofxPXCU::Update()
 	PXCUPipeline_ReleaseFrame(mSession);
 }
 
-ofTexture& ofxPXCU::GetRGB()
+ofTexture& ofxPXCU::GetRGBMap()
 {
 	return mRGBTex;
 }
 
-ofTexture& ofxPXCU::GetDepth()
+ofTexture& ofxPXCU::GetDepthMap()
 {
 	return mDepthTex;
+}
+
+ofTexture& ofxPXCU::GetLabelMap()
+{
+    return mLabelTex;
 }
 	
 void ofxPXCU::toTexture(unsigned short *src, unsigned char *dstB, ofTexture &dst)
