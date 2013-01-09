@@ -8,7 +8,11 @@ ofxPXCU::ofxPXCU()
 ofxPXCU::~ofxPXCU()
 {
 	if(mSession)
+	{
+		if(!mReleased)
+			PXCUPipeline_ReleaseFrame(mSession);
 		PXCUPipeline_Close(mSession);
+	}
 }
 
 bool ofxPXCU::Start()
@@ -49,8 +53,8 @@ bool ofxPXCU::Start()
 	return true;
 }
 
-// call with pRes=0 for VGA, pRes=1 for WXGA
-void ofxPXCU::EnableRGB(int pRes)
+// call with pVGARes=0 for VGA, pVGARes=1 for WXGA
+void ofxPXCU::EnableRGB(int pVGARes)
 {
 	PXCUPipeline rgbMode;
 	switch(pRes)
@@ -86,29 +90,23 @@ void ofxPXCU::EnableDepth()
     if(!mHasDepth)
     {
     	if(mMode<0)
-    	{
     		mMode = (PXCUPipeline)PXCU_PIPELINE_DEPTH_QVGA;
-    	}
     	else
-    	{
     		mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_DEPTH_QVGA);
-    	}
     	mHasDepth = true;
     }
 }
 
-void ofxPXCU::EnableGesture()
+//call with pGetLabelMap=true to get the labelmap as a texture
+//useful for visualization
+void ofxPXCU::EnableGesture(bool pGetLabelMap)
 {
     if(!mHasGesture)
     {
         if(mMode<0)
-        {
             mMode = (PXCUPipeline)PXCU_PIPELINE_GESTURE;
-        }
         else
-        {
             mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_GESTURE);
-        }
     }
 }
 
@@ -126,28 +124,75 @@ bool ofxPXCU::Update()
 	{
 		PXCUPipeline_QueryDepthMap(mSession, mDepth);
 		if(mDepth)
-		{
 			toTexture((unsigned short*)mDepth, mDepthMap, mDepthTex);	
-		}
 	}
 	PXCUPipeline_ReleaseFrame(mSession);
 }
 
-ofTexture& ofxPXCU::GetRGBMap()
+//RGB Draw ========================================================================
+void ofxPXCU::DrawRGBMap(ofPoint pLeftTop)
 {
-	return mRGBTex;
+}
+void ofxPXCU::DrawRGBMap(float pLeft, float pTop)
+{
+	DrawRGBMap(ofPoint(pLeft, pTop));
+}
+void ofxPXCU::DrawRGBMap(ofPoint pLeftTop, ofPoint pWidthHeight)
+{
+}
+void ofxPXCU::DrawRGBMap(float pLeft, float pTop, float pWidth, float pHeight)
+{
+	DrawRGBMap(ofPoint(pLeft, pTop),ofPoint(pWidth, pHeight));
 }
 
-ofTexture& ofxPXCU::GetDepthMap()
+//Depth Draw ========================================================================
+void ofxPXCU::DrawDepthMap(ofPoint pLeftTop)
 {
-	return mDepthTex;
+}
+void ofxPXCU::DrawDepthMap(float pLeft, float pTop)
+{
+	DrawDepthMap(ofPoint(pLeft, pTop));
+}
+void ofxPXCU::DrawDepthMap(ofPoint pLeftTop, ofPoint pWidthHeight)
+{
+}
+void ofxPXCU::DrawDepthMap(float pLeft, float pTop, float pWidth, float pHeight)
+{
+	DrawDepthMap(ofPoint(pLeft,pTop), ofPoint(pWidth, pHeight));
 }
 
-ofTexture& ofxPXCU::GetLabelMap()
+//Label Draw ========================================================================
+void ofxPXCU::DrawLabelMap(ofPoint pLeftTop)
 {
-    return mLabelTex;
 }
-	
+void ofxPXCU::DrawLabelMap(float pLeft, float pTop)
+{
+	DrawLabelMap(ofPoint(pLeft, pTop));
+}
+void ofxPXCU::DrawLabelMap(ofPoint pLeftTop, ofPoint pWidthHeight)
+{
+}
+void ofxPXCU::DrawLabelMap(float pLeft, float pTop, float pWidth, float pHeight)
+{
+	DrawLabelMap(ofPoint(pLeft, pTop), ofPoint(pWidth, pHeight));
+}
+
+//IR Draw ========================================================================
+void ofxPXCU::DrawIRMap(ofPoint pLeftTop)
+{
+}
+void ofxPXCU::DrawIRMap(float pLeft, float pTop)
+{
+	DrawIRMap(ofPoint(pLeft, pTop));
+}
+void ofxPXCU::DrawIRMap(ofPoint pLeftTop, ofPoint pWidthHeight)
+{
+}
+void ofxPXCU::DrawIRMap(float pLeft, float pTop, float pWidth, float pHeight)
+{
+	DrawIRMap(ofPoint(pLeft, pTop), ofPoint(pWidth, pHeight));
+}
+
 void ofxPXCU::toTexture(unsigned short *src, unsigned char *dstB, ofTexture &dst)
 {
     float minC = 0xffff;
@@ -159,7 +204,8 @@ void ofxPXCU::toTexture(unsigned short *src, unsigned char *dstB, ofTexture &dst
         if (minC>vC) minC = vC;
         if (maxC<vC) maxC = vC;
     }
-    for(int i=0;i<txsize;i++) {
+    for(int i=0;i<txsize;i++)
+	{
         float val = (float)src[i]/0xffff;
         val = 255.f*sqrt((val-minC)/(maxC-minC));
         dstB[i]=255-(unsigned char)val;
