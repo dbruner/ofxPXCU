@@ -1,7 +1,4 @@
-#include <string>
-#include <vector>
 #include "ofMain.h"
-#include "ofTexture.h"
 #include "pxcupipeline.h"
 
 class ofxPXCU
@@ -35,7 +32,7 @@ private:
 	ofTexture mRGBTex;
 	ofTexture mDepthTex;
 
-	void toTexture(unsigned short* src, ofTexture* dst);
+	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture& dst);
 };
 
 /*
