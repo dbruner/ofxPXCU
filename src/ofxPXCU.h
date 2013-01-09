@@ -20,7 +20,7 @@ private:
 class ofxPXCU
 {
 public:
-	static enum Labels
+	static enum NodeLabel
 	{
 		HAND_0 = (int)PXCGesture::GeoNode::LABEL_BODY_HAND_PRIMARY,
 		HAND_1 = (int)PXCGesture::GeoNode::LABEL_BODY_HAND_SECONDARY,
@@ -51,61 +51,35 @@ public:
 	ofxPXCU();
 	~ofxPXCU();
 
+	ofTexture RGBTex
+	ofTexture DepthTex;
+	ofTexture LabelTex;
+	ofTexture IRTex;
+	ofPoint[] DepthPoints();
+
+	void EnableRGB(bool pIsWXGA);
+	void EnableDepth(bool pDrawDepth);
+	void EnableGesture(bool pDrawLabel);
+	void EnableIR(bool pDrawIR);
+	
 	bool Start();
-	void EnableRGB(int pVGARes);
-	void EnableDepth();
-	void EnableGesture(bool pGetLabelMap);
-
 	bool Update();
-
-	void DrawRGBMap(ofPoint pLeftTop);
-	void DrawRGBMap(float pLeft, float pTop);
-	void DrawRGBMap(ofPoint pLeftTop, ofPoint pWidthHeight);
-	void DrawRGBMap(float pLeft, float pTop, float pWidth, float pHeight);
-
-	void DrawDepthMap(ofPoint pLeftTop);
-	void DrawDepthMap(float pLeft, float pTop);
-	void DrawDepthMap(ofPoint pLeftTop, ofPoint pWidthHeight);
-	void DrawDepthMap(float pLeft, float pTop, float pWidth, float pHeight);
 	
-	void DrawLabelMap(ofPoint pLeftTop);
-	void DrawLabelMap(float pLeft, float pTop);
-	void DrawLabelMap(ofPoint pLeftTop, ofPoint pWidthHeight);
-	void DrawLabelMap(float pLeft, float pTop, float pWidth, float pHeight);
-	
-	void DrawIRMap(ofPoint pLeftTop);
-	void DrawIRMap(float pLeft, float pTop);
-	void DrawIRMap(ofPoint pLeftTop, ofPoint pWidthHeight);
-	void DrawIRMap(float pLeft, float pTop, float pWidth, float pHeight);
+	void LoadDepthPoints();
 
-	short GetDepthValue(ofPoint pCoords);
-	short GetDepthValue(int px, int py);
-	inline short* GetDepthValues(){return mDepth;};
-
-	inline ofTexture& GetRGBMap(){return mRGBTex;};
-	inline ofTexture& GetDepthMap(){return mDepthTex;};
-	inline ofTexture& GetLabelMap(){return mLabelTex;};
-	inline ofTexture& GetIRMap(){return mIRTex;};
+	inline short* GetDepthRef(){return mDepth;};
 
 private:
 	PXCUPipeline_Instance mSession;
 	PXCPUPipeline mMode;
 
-	bool mReleased;
-	bool mHasRGB;
-	bool mHasDepth;
-	bool mHasLabel;
-	bool mHasGesture;
-
+	bool mReleased, mHasRGB, mHasDepth, mDrawDepth, mDrawLabel, mHasGesture;
+	
+	int mDepthWidth, mDepthHeight;
 	short* mDepth;
 	unsigned char* mDepthMap;
 	unsigned char* mRGBMap;
 	unsigned char* mLabelMap;
 
-	ofTexture mRGBTex;
-	ofTexture mDepthTex;
-	ofTexture mLabelTex;
-	ofTexture mIRTex;
-	
 	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture& dst);
 };
