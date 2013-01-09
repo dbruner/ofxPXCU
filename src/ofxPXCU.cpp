@@ -1,4 +1,4 @@
-#include "ofMain.h"
-#include "pxcupipeline.h"
+#include "ofxPXCU.h"
+
 
 //Placeholder
