@@ -7,7 +7,7 @@ public:
 	ofxPXCU();
 	~ofxPXCU();
 
-	bool Init();
+	bool Start();
 	void EnableRGB(std::string pMode);
 	void EnableDepth();
 	void EnableGesture();
