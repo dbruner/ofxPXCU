@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
+    <ProjectGuid>{5053161E-B63E-4B8F-81BF-77CBAD4D9BB5}</ProjectGuid>
     <RootNamespace>example_capture</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
