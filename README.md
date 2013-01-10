@@ -3,7 +3,6 @@ ofxPXCU - openFrameworks addon for the Perceptual Computing SDK
 <b>A wrapper for the Intel Perceptual Computing SDK's simplified utility interface (PXCUPipeline)<br/>
 Download the [Perceptual Computing SDK](http://software.intel.com/en-us/vcsource/tools/perceptual-computing-sdk)<br/>
 Download [openFrameworks](http://openframeworks.cc)</b><br/>
-<br/>
 
 This wrapper aims to provide access to all the features provided by the Perceptual Computing SDK's simple utility interface.<br/>
 Currently implemented features include:
