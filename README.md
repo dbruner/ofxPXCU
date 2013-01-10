@@ -15,3 +15,6 @@ Support for the following features is currently being implemented and will be av
 * Hand and Fingertip Tracking
 * Face Location and Landmark Detection
 * Simple Gesture Recognition
+
+<h3>Examples</h3>
+Also coming soon <i>(by the end of Jan '13 -sG)</i>
