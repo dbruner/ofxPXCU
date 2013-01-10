@@ -17,4 +17,4 @@ Support for the following features is currently being implemented and will be av
 * Simple Gesture Recognition
 
 <h3>Examples</h3>
-Also coming soon <i>(by mid-Jan '13 -sG)</i>
+* example-capture: Grabbing RGB, Depth, Label/Blob, and IR images.
