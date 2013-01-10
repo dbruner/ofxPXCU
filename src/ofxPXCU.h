@@ -1,3 +1,4 @@
+#include <vector>
 #include "ofMain.h"
 #include "pxcupipeline.h"
 
@@ -11,11 +12,11 @@ public:
 	~ofxGeoNode();
 	void DebugDraw();
 	inline int GetOpenness(){return (int)mGeoNode.openness;};
-	inline int GetConfidence(){return (int)mGeoNode.confidence};
+	inline int GetConfidence(){return (int)mGeoNode.confidence;};
 
 private:
 	PXCGesture::GeoNode mGeoNode;
-}
+};
 
 class ofxPXCU
 {
@@ -51,11 +52,11 @@ public:
 	ofxPXCU();
 	~ofxPXCU();
 
-	ofTexture RGBTex
+	ofTexture RGBTex;
 	ofTexture DepthTex;
 	ofTexture LabelTex;
 	ofTexture IRTex;
-	ofPoint[] DepthPoints();
+	std::vector<ofPoint> DepthPoints;
 
 	void EnableRGB(bool pIsWXGA);
 	void EnableDepth(bool pDrawDepth);
@@ -67,19 +68,18 @@ public:
 	
 	void LoadDepthPoints();
 
-	inline short* GetDepthRef(){return mDepth;};
-
 private:
 	PXCUPipeline_Instance mSession;
-	PXCPUPipeline mMode;
+	int mMode;
 
 	bool mReleased, mHasRGB, mHasDepth, mDrawDepth, mDrawLabel, mHasGesture;
 	
 	int mDepthWidth, mDepthHeight;
 	short* mDepth;
-	unsigned char* mDepthMap;
+	short* mIR;
 	unsigned char* mRGBMap;
+	unsigned char* mDepthMap;
 	unsigned char* mLabelMap;
 
-	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture& dst);
+	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture* dst);
 };

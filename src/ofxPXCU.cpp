@@ -3,6 +3,12 @@
 ofxPXCU::ofxPXCU()
 {
 	mMode = -1;
+	mReleased = false;
+	mHasRGB = false;
+	mHasDepth = false;
+	mDrawDepth = false;
+	mDrawLabel = false;
+	mHasGesture = false;
 }
 
 ofxPXCU::~ofxPXCU()
@@ -15,54 +21,10 @@ ofxPXCU::~ofxPXCU()
 	}
 }
 
-bool ofxPXCU::Start()
-{
-	int w,h;
-	if(mMode==-1)
-	{
-		mMode = (PXCUPipeline)PXCU_PIPELINE_COLOR_VGA;
-		mHasRGB = true;
-		mHasDepth = false;
-	}
-	mSession = PXCUPipeline_Init(mMode);
-	if(!mSession)
-		return false;
-
-	if(mHasRGB)
-	{
-		PXCUPipeline_QueryRGBSize(mSession, &w, &h);
-		mRGB = new unsigned char[w*h*4];
-		RGBTex = ofTexture();
-		RGBTex.allocate(w,h,GL_RGBA);
-	}
-	if(mHasDepth)
-	{
-		PXCUPipeline_QueryDepthMapSize(mSession, &w, &h);
-		mDepth = new short[w*h];
-		if(mDrawDepth)
-		{
-			mDepthMap = new unsigned char[w*h];
-			DepthTex.allocate(w,h,GL_LUMINANCE);
-		}
-	}
-    if(mHasGesture)
-	{
-		PXCUPipeline_QueryLabelMapSize(mSession, &w, &h);
-		if(mDrawLabel)
-		{
-			mLabelMap = new unsigned char[w*h];
-			LabelTex = ofTexture();
-			LabelTex.allocate(w,h,GL_LUMINANCE);
-		}
-	}    
-	return true;
-}
-
-// call with pVGARes=0 for VGA, pVGARes=1 for WXGA
 void ofxPXCU::EnableRGB(bool pIsWXGA)
 {
-	PXCUPipeline rgbMode = pIsWXGA?(PXCUPipeline)PXCU_PIPELINE_COLOR_WXGA:(PXCUPipeline)PXCU_PIPELINE_COLOR_VGA;
-	if(!mHasRgb)
+	int rgbMode = pIsWXGA?(int)PXCU_PIPELINE_COLOR_WXGA:(int)PXCU_PIPELINE_COLOR_VGA;
+	if(!mHasRGB)
 	{
     	if(mMode<0)
     	{
@@ -70,9 +32,9 @@ void ofxPXCU::EnableRGB(bool pIsWXGA)
     	}
     	else
     	{
-    		mMode = (PXCUPipeline)(mMode|rgbMode);
+    		mMode = (int)(mMode|rgbMode);
     	}
-    	mHasRgb = true;
+    	mHasRGB = true;
 		RGBTex = ofTexture();
 	}
 }
@@ -82,9 +44,9 @@ void ofxPXCU::EnableDepth(bool pDrawDepth)
     if(!mHasDepth)
     {
     	if(mMode<0)
-    		mMode = (PXCUPipeline)PXCU_PIPELINE_DEPTH_QVGA;
+    		mMode = PXCU_PIPELINE_DEPTH_QVGA;
     	else
-    		mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_DEPTH_QVGA);
+    		mMode = (int)(mMode|PXCU_PIPELINE_DEPTH_QVGA);
     	mHasDepth = true;
 		mDrawDepth = pDrawDepth;
 		if(mDrawDepth)
@@ -107,6 +69,55 @@ void ofxPXCU::EnableGesture(bool pDrawLabel)
     }
 }
 
+void ofxPXCU::EnableIR(bool pDrawIR)
+{
+}
+
+bool ofxPXCU::Start()
+{
+	int w,h;
+	
+	if(mMode==-1)
+	{
+		mMode = (PXCUPipeline)PXCU_PIPELINE_COLOR_VGA;
+		mHasRGB = true;
+		mHasDepth = false;
+		mHasGesture = false;
+	}
+	mSession = PXCUPipeline_Init((PXCUPipeline)mMode);
+	if(!mSession)
+		return false;
+
+	if(mHasRGB)
+	{
+		PXCUPipeline_QueryRGBSize(mSession, &w, &h);
+		mRGBMap = new unsigned char[w*h*4];
+		RGBTex = ofTexture();
+		RGBTex.allocate(w,h,GL_RGBA);
+	}
+	if(mHasDepth)
+	{
+		PXCUPipeline_QueryDepthMapSize(mSession, &mDepthWidth, &mDepthHeight);
+		mDepth = new short[mDepthWidth*mDepthHeight];
+		if(mDrawDepth)
+		{
+			mDepthMap = new unsigned char[mDepthWidth*mDepthHeight];
+			DepthTex.allocate(mDepthWidth,mDepthHeight,GL_LUMINANCE);
+		}
+	}
+    if(mHasGesture)
+	{
+		PXCUPipeline_QueryLabelMapSize(mSession, &w, &h);
+		if(mDrawLabel)
+		{
+			mLabelMap = new unsigned char[w*h];
+			LabelTex = ofTexture();
+			LabelTex.allocate(w,h,GL_LUMINANCE);
+		}
+	}    
+	return true;
+}
+
 bool ofxPXCU::Update()
 {
 	if(!PXCUPipeline_AcquireFrame(mSession, true))
@@ -114,21 +125,32 @@ bool ofxPXCU::Update()
 	mReleased = false;
 	if(mHasRGB)
 	{
-		PXCUPipeline_QueryRGB(mSession, mRGB);
-		if(mRGB)
-			mRGBTex.loadData(mRGB, mRGBTex.getWidth(), mRGBTex.getHeight(), GL_RGBA);
+		PXCUPipeline_QueryRGB(mSession, mRGBMap);
+		if(mRGBMap)
+			RGBTex.loadData(mRGBMap, RGBTex.getWidth(), RGBTex.getHeight(), GL_RGBA);
 	}
 	if(mHasDepth)
 	{
 		PXCUPipeline_QueryDepthMap(mSession, mDepth);
-		if(mDepth)
-			toTexture((unsigned short*)mDepth, mDepthMap, mDepthTex);	
+		if(mDepth&&mDrawDepth)
+			toTexture((unsigned short*)mDepth, mDepthMap, &DepthTex);
+	}
+	if(mHasGesture)
+	{
+		PXCUPipeline_QueryLabelMap(mSession, mLabelMap, 0);
+		if(mLabelMap&&mDrawLabel)
+			LabelTex.loadData(mLabelMap, LabelTex.getWidth(), LabelTex.getHeight(), GL_LUMINANCE);
+
 	}
 	PXCUPipeline_ReleaseFrame(mSession);
 	mReleased = true;
 }
 
-void ofxPXCU::toTexture(unsigned short *src, unsigned char *dstB, ofTexture &dst)
+void ofxPXCU::LoadDepthPoints()
+{
+}
+
+void ofxPXCU::toTexture(unsigned short* src, unsigned char* dstB, ofTexture* dst)
 {
     float minC = 0xffff;
     float maxC = -0xffff;
