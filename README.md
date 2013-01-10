@@ -11,10 +11,10 @@ Currently implemented features include:
 * IR Capture
 * Label/Blob Capture
  
-Support for the following features is currently being implemented and will be available soon <i>(by the end of Jan '13 -sG)</i>:
+Support for the following features is currently being implemented and will be available soon <i>(by the end of Jan '13 -[sG](mailto:seth.gibson@intel.com))</i>:
 * Hand and Fingertip Tracking
 * Face Location and Landmark Detection
 * Simple Gesture Recognition
 
 <h3>Examples</h3>
-* example-capture: Grabbing RGB, Depth, Label/Blob, and IR images. <i>(Set the startup project to example-capture -sG)</i>
+* example-capture: Grabbing RGB, Depth, Label/Blob, and IR images. <i>(Set the startup project to example-capture -[sG](mailto:seth.gibson@intel.com))</i>
