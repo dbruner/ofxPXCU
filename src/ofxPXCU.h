@@ -21,7 +21,7 @@ private:
 class ofxPXCU
 {
 public:
-	static enum NodeLabel
+	enum NodeLabel
 	{
 		HAND_0 = (int)PXCGesture::GeoNode::LABEL_BODY_HAND_PRIMARY,
 		HAND_1 = (int)PXCGesture::GeoNode::LABEL_BODY_HAND_SECONDARY,
