@@ -9,6 +9,8 @@ ofxPXCU::ofxPXCU()
 	mDrawDepth = false;
 	mDrawLabel = false;
 	mHasGesture = false;
+	mHasIR = false;
+	mDrawIR = false;
 }
 
 ofxPXCU::~ofxPXCU()
@@ -26,6 +28,7 @@ void ofxPXCU::EnableRGB(bool pIsWXGA)
 	int rgbMode = pIsWXGA?(int)PXCU_PIPELINE_COLOR_WXGA:(int)PXCU_PIPELINE_COLOR_VGA;
 	if(!mHasRGB)
 	{
+		mHasRGB = true;
     	if(mMode<0)
     	{
     		mMode = rgbMode;
@@ -34,7 +37,6 @@ void ofxPXCU::EnableRGB(bool pIsWXGA)
     	{
     		mMode = (int)(mMode|rgbMode);
     	}
-    	mHasRGB = true;
 		RGBTex = ofTexture();
 	}
 }
@@ -43,12 +45,12 @@ void ofxPXCU::EnableDepth(bool pDrawDepth)
 {
     if(!mHasDepth)
     {
+    	mHasDepth = true;
+		mDrawDepth = pDrawDepth;
     	if(mMode<0)
     		mMode = PXCU_PIPELINE_DEPTH_QVGA;
     	else
     		mMode = (int)(mMode|PXCU_PIPELINE_DEPTH_QVGA);
-    	mHasDepth = true;
-		mDrawDepth = pDrawDepth;
 		if(mDrawDepth)
 			DepthTex = ofTexture();
     }
@@ -58,12 +60,12 @@ void ofxPXCU::EnableGesture(bool pDrawLabel)
 {
     if(!mHasGesture)
     {
+		mHasGesture = true;
+		mDrawLabel = pDrawLabel;
         if(mMode<0)
             mMode = (PXCUPipeline)PXCU_PIPELINE_GESTURE;
         else
             mMode = (PXCUPipeline)(mMode|PXCU_PIPELINE_GESTURE);
-		mHasGesture = true;
-		mDrawLabel = pDrawLabel;
 		if(mDrawLabel)
 			LabelTex = ofTexture();
     }
@@ -71,6 +73,13 @@ void ofxPXCU::EnableGesture(bool pDrawLabel)
 
 void ofxPXCU::EnableIR(bool pDrawIR)
 {
+	if(!mHasIR)
+	{
+		mHasIR = true;
+		mDrawIR = pDrawIR;
+		if(mDrawIR)
+			IRTex = ofTexture();
+	}
 }
 
 bool ofxPXCU::Start()
@@ -80,9 +89,14 @@ bool ofxPXCU::Start()
 	if(mMode==-1)
 	{
 		mMode = (PXCUPipeline)PXCU_PIPELINE_COLOR_VGA;
-		mHasRGB = true;
+		mReleased = false;
+		mHasRGB = false;
 		mHasDepth = false;
+		mDrawDepth = false;
+		mDrawLabel = false;
 		mHasGesture = false;
+		mHasIR = false;
+		mDrawIR = false;
 	}
 	mSession = PXCUPipeline_Init((PXCUPipeline)mMode);
 	if(!mSession)
@@ -111,10 +125,19 @@ bool ofxPXCU::Start()
 		if(mDrawLabel)
 		{
 			mLabelMap = new unsigned char[w*h];
-			LabelTex = ofTexture();
 			LabelTex.allocate(w,h,GL_LUMINANCE);
 		}
 	}    
+	if(mHasIR)
+	{
+		PXCUPipeline_QueryIRMapSize(mSession, &w, &h);
+		mIR = new short[w*h];
+		if(mDrawIR)
+		{
+			mIRMap = new unsigned char[w*h];
+			IRTex.allocate(w,h,GL_LUMINANCE);
+		}
+	}
 	return true;
 }
 
@@ -133,7 +156,7 @@ bool ofxPXCU::Update()
 	{
 		PXCUPipeline_QueryDepthMap(mSession, mDepth);
 		if(mDepth&&mDrawDepth)
-			toTexture((unsigned short*)mDepth, mDepthMap, &DepthTex);
+			toTexture((unsigned short*)mDepth, mDepthMap, &DepthTex, true);
 	}
 	if(mHasGesture)
 	{
@@ -142,32 +165,40 @@ bool ofxPXCU::Update()
 			LabelTex.loadData(mLabelMap, LabelTex.getWidth(), LabelTex.getHeight(), GL_LUMINANCE);
 
 	}
+	if(mHasIR)
+	{
+		PXCUPipeline_QueryIRMap(mSession, mIR);
+		if(mIR&&mDrawIR)
+			toTexture((unsigned short*)mIR, mIRMap, &IRTex, false);
+
+	}
 	PXCUPipeline_ReleaseFrame(mSession);
 	mReleased = true;
+	return true;
 }
 
 void ofxPXCU::LoadDepthPoints()
 {
 }
 
-void ofxPXCU::toTexture(unsigned short* src, unsigned char* dstB, ofTexture* dst)
+void ofxPXCU::toTexture(unsigned short* pSrc, unsigned char* pDstB, ofTexture* pDst, bool pInvert)
 {
     float minC = 0xffff;
     float maxC = -0xffff;
-	int tx = dst->getWidth();
-	int ty = dst->getHeight();
+	int tx = pDst->getWidth();
+	int ty = pDst->getHeight();
 
 	for(int k=0;k<tx*ty;k++)
 	{
-        float vC = (float)src[k]/0xffff;
+        float vC = (float)pSrc[k]/0xffff;
         if (minC>vC) minC = vC;
         if (maxC<vC) maxC = vC;
     }
     for(int i=0;i<tx*ty;i++)
 	{
-        float val = (float)src[i]/0xffff;
+        float val = (float)pSrc[i]/0xffff;
         val = 255.f*sqrt((val-minC)/(maxC-minC));
-        dstB[i]=255-(unsigned char)val;
+        pDstB[i]=pInvert?255-(unsigned char)val:(unsigned char)val;
     }
-	dst->loadData(dstB,tx,ty,GL_LUMINANCE);
+	pDst->loadData(pDstB,tx,ty,GL_LUMINANCE);
 }

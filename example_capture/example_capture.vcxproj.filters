@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\testApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxPXCU.cpp">
+      <Filter>ofxPXCU\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ofxPXCU">
+      <UniqueIdentifier>{6fe6652b-a478-4894-8201-3a1017d3c305}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ofxPXCU\src">
+      <UniqueIdentifier>{57a55558-2d64-4501-8502-a5367cc7b40d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\testApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxPXCU.h">
+      <Filter>ofxPXCU\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

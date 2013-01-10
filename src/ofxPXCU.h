@@ -5,14 +5,14 @@
 class ofxGeoNode
 {
 public:
-	ofPoint imagePos;
-	ofPoint worldPos;
-	
 	ofxGeoNode(PXCGesture::GeoNode pNode);
 	~ofxGeoNode();
 	void DebugDraw();
 	inline int GetOpenness(){return (int)mGeoNode.openness;};
 	inline int GetConfidence(){return (int)mGeoNode.confidence;};
+
+	ofPoint imagePos;
+	ofPoint worldPos;
 
 private:
 	PXCGesture::GeoNode mGeoNode;
@@ -52,12 +52,6 @@ public:
 	ofxPXCU();
 	~ofxPXCU();
 
-	ofTexture RGBTex;
-	ofTexture DepthTex;
-	ofTexture LabelTex;
-	ofTexture IRTex;
-	std::vector<ofPoint> DepthPoints;
-
 	void EnableRGB(bool pIsWXGA);
 	void EnableDepth(bool pDrawDepth);
 	void EnableGesture(bool pDrawLabel);
@@ -68,18 +62,23 @@ public:
 	
 	void LoadDepthPoints();
 
-private:
-	PXCUPipeline_Instance mSession;
-	int mMode;
+	std::vector<ofPoint> DepthPoints;
+	ofTexture RGBTex;
+	ofTexture DepthTex;
+	ofTexture LabelTex;
+	ofTexture IRTex;
 
-	bool mReleased, mHasRGB, mHasDepth, mDrawDepth, mDrawLabel, mHasGesture;
-	
-	int mDepthWidth, mDepthHeight;
+
+private:
+	void toTexture(unsigned short* pSrc, unsigned char* pDstB, ofTexture* pDst, bool pInvert);
+
+	bool mReleased, mHasRGB, mHasDepth, mHasIR, mDrawDepth, mDrawLabel, mDrawIR, mHasGesture;
+	int mMode, mDepthWidth, mDepthHeight;
 	short* mDepth;
 	short* mIR;
 	unsigned char* mRGBMap;
 	unsigned char* mDepthMap;
+	unsigned char* mIRMap;
 	unsigned char* mLabelMap;
-
-	void toTexture(unsigned short* src, unsigned char* dstB, ofTexture* dst);
+	PXCUPipeline_Instance mSession;
 };
