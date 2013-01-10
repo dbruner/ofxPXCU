@@ -9,6 +9,7 @@ Currently implemented features include:
 * RGB Capture (VGA and WXGA resolutions)
 * Depth Capture
 * IR Capture
+* Label/Blob Capture
  
 Support for the following features is currently being implemented and will be available soon <i>(by the end of Jan '13 -sG)</i>:
 * Hand and Fingertip Tracking
@@ -16,4 +17,4 @@ Support for the following features is currently being implemented and will be av
 * Simple Gesture Recognition
 
 <h3>Examples</h3>
-Also coming soon <i>(by the end of Jan '13 -sG)</i>
+Also coming soon <i>(by mid-Jan '13 -sG)</i>
