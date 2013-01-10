@@ -17,4 +17,4 @@ Support for the following features is currently being implemented and will be av
 * Simple Gesture Recognition
 
 <h3>Examples</h3>
-* example-capture: Grabbing RGB, Depth, Label/Blob, and IR images.
+* example-capture: Grabbing RGB, Depth, Label/Blob, and IR images. <i>(Set the startup project to example-capture -sG)</i>
